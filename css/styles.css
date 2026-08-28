@@ -16,7 +16,9 @@ button{font-family:inherit}
 .top{max-width:1120px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
 .mark{width:40px;height:40px;border-radius:11px;flex:none;display:block}
-.brand b{font-weight:700;font-size:17px;color:var(--forest);letter-spacing:-.2px}
+.brandtxt{display:flex;flex-direction:column;line-height:1.2}
+.brand b{font-weight:700;font-size:17px;color:#0b0b0b;letter-spacing:-.2px}
+.brandtxt small{font-size:11px;font-weight:500;color:#4a4a4a;letter-spacing:.01em;margin-top:1px}
 .gov{font-size:11px;color:var(--muted);text-align:right;line-height:1.35}
 .gov strong{color:var(--forest);font-weight:600}
 
