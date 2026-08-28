@@ -248,19 +248,22 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   <button class="btn btn-primary" type="button" data-open-form>Find a match — free</button>
 </div>
 
-<!-- ============ ENQUIRY MODAL ============ -->
+<!-- ============ ENQUIRY MODAL — full-screen app flow ============ -->
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Enquiry form" aria-hidden="true">
   <div class="modal-ov" data-close-form></div>
   <div class="modal-card">
     <div class="formcard" id="formcard">
-      <button class="modal-x" type="button" data-close-form aria-label="Close">
-        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      <div class="fc-head">
-        <h2>Get matched — it's free</h2>
-        <p>Takes under a minute · One verified business contacts you</p>
+      <div class="fs-head">
+        <button class="fs-back" id="fsback" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+        <div class="fs-titles"><b>Find a match</b><small id="fssub">What do you need?</small></div>
+        <button class="modal-x" type="button" data-close-form aria-label="Close">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
       <div class="fc-prog"><i id="prog"></i></div>
       <div class="fc-body" id="fcbody"><!-- steps render here --></div>
+      <div class="fs-foot"><button class="btn btn-primary" id="fsnext" type="button" disabled>Continue
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </div>
   </div>
 </div>

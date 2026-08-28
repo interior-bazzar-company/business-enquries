@@ -60,12 +60,16 @@ try{
 }catch(e){}
 
 /* =================================================================
-   Step engine
+   Step engine — full-screen app flow: header back button, dynamic
+   subtitle, option grid in the body, sticky Continue in the footer
+   that stays disabled until the step is answered.
    ================================================================= */
 var state = { service:null, scope:null, city:"", pincode:"", timeline:null, budget:null,
               name:"", phone:"", consent:false };
 var stepIdx = 0;
 var TOTAL_STEPS = 5;
+var submitting = false;
+var doneShown = false;
 var body = document.getElementById("fcbody");
 var prog = document.getElementById("prog");
 var maxStepSeen = -1;
@@ -75,51 +79,52 @@ function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
 
 function svc(){ return SERVICES.filter(function(s){return s.id===state.service;})[0] || null; }
 
-function setProg(){ prog.style.width = Math.round(((stepIdx+1)/TOTAL_STEPS)*100) + "%"; }
-
-function stepLabel(){ return "Step " + (stepIdx+1) + " of " + TOTAL_STEPS; }
-
-function navRow(nextLabel, backable){
-  return '<div class="fc-nav">' +
-    (backable ? '<button type="button" class="btn btn-back" data-back aria-label="Go back">' +
-      '<svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>' : '') +
-    '<button type="button" class="btn btn-primary" data-next>' + nextLabel + '</button></div>';
+function stepQuestion(){
+  switch(stepIdx){
+    case 0: return "What do you need?";
+    case 1: return svc() ? svc().scopeQ : "";
+    case 2: return "Where is the project?";
+    case 3: return "When do you want to start?";
+    case 4: return "Where should the business reach you?";
+  }
+  return "";
 }
 
 var privacyNote = '<p class="fc-note"><svg viewBox="0 0 24 24"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"/></svg>' +
   '<span>Your details are shared only with Interior bazzar and the one matched business — never broadcast or resold.</span></p>';
 
+/* one compact option card; icon is optional */
+function opt(attr, val, label, sel, iconHtml){
+  return '<button type="button" class="opt'+(sel?" sel":"")+'" data-'+attr+'="'+esc(val)+'">' +
+    (iconHtml||'') + '<span class="olb">'+esc(label)+'</span></button>';
+}
+
 function render(){
-  setProg();
+  prog.style.width = Math.round(((stepIdx+1)/TOTAL_STEPS)*100) + "%";
   if(stepIdx > maxStepSeen){ maxStepSeen = stepIdx; track("lead_step_view", {step: stepIdx+1, service: state.service||""}); }
   switch(stepIdx){
 
-    case 0: /* service — the scaling seam renders from config */
+    case 0: /* service — renders from config */
       body.innerHTML =
-        '<p class="fc-step-label">'+stepLabel()+'</p>' +
         '<p class="fc-q">What do you need?</p>' +
         '<p class="fc-hint">Pick the closest — details come next.</p>' +
-        '<div class="optgrid cols1">' + SERVICES.map(function(s){
-          return '<button type="button" class="opt'+(state.service===s.id?" sel":"")+'" data-service="'+s.id+'">' +
-            '<span class="oic">'+ICONS[s.icon]+'</span>' +
-            '<span>'+esc(s.label)+'<small>'+esc(s.small)+'</small></span></button>';
+        '<div class="optgrid">' + SERVICES.map(function(s){
+          return opt("service", s.id, s.label, state.service===s.id, '<span class="oic">'+ICONS[s.icon]+'</span>');
         }).join("") + '</div>' + privacyNote;
       break;
 
     case 1: /* scope — question comes from the chosen service's config */
       var s = svc();
       body.innerHTML =
-        '<p class="fc-step-label">'+stepLabel()+'</p>' +
         '<p class="fc-q">'+esc(s.scopeQ)+'</p>' +
         '<p class="fc-hint">'+esc(s.scopeHint)+'</p>' +
-        '<div class="pillwrap">' + s.scopes.map(function(sc){
-          return '<button type="button" class="opt-pill'+(state.scope===sc?" sel":"")+'" data-scope="'+esc(sc)+'">'+esc(sc)+'</button>';
-        }).join("") + '</div>' + navRow("Continue", true);
+        '<div class="optgrid">' + s.scopes.map(function(sc){
+          return opt("scope", sc, sc, state.scope===sc);
+        }).join("") + '</div>';
       break;
 
     case 2: /* location */
       body.innerHTML =
-        '<p class="fc-step-label">'+stepLabel()+'</p>' +
         '<p class="fc-q">Where is the project?</p>' +
         '<p class="fc-hint">We match you with a business that serves your area.</p>' +
         '<div class="field"><label for="f-city">City</label>' +
@@ -127,27 +132,24 @@ function render(){
           '<p class="ferr" id="e-city">Please enter your city.</p></div>' +
         '<div class="field"><label for="f-pin">Pincode <span class="optional">(optional, sharpens the match)</span></label>' +
           '<input id="f-pin" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit pincode" value="'+esc(state.pincode)+'" />' +
-          '<p class="ferr" id="e-pin">Pincode should be 6 digits.</p></div>' +
-        navRow("Continue", true);
+          '<p class="ferr" id="e-pin">Pincode should be 6 digits.</p></div>';
       break;
 
     case 3: /* timeline + budget */
       body.innerHTML =
-        '<p class="fc-step-label">'+stepLabel()+'</p>' +
         '<p class="fc-q">When do you want to start?</p>' +
         '<p class="fc-hint">"Just exploring" is a perfectly good answer.</p>' +
-        '<div class="pillwrap">' + TIMELINES.map(function(t){
-          return '<button type="button" class="opt-pill'+(state.timeline===t?" sel":"")+'" data-timeline="'+esc(t)+'">'+esc(t)+'</button>';
+        '<div class="optgrid">' + TIMELINES.map(function(t){
+          return opt("timeline", t, t, state.timeline===t);
         }).join("") + '</div>' +
-        '<p class="fc-q" style="margin-top:18px;font-size:16px">Rough budget <span style="font-weight:400;color:var(--muted);font-size:13px">(optional)</span></p>' +
-        '<div class="pillwrap">' + BUDGETS.map(function(b){
-          return '<button type="button" class="opt-pill'+(state.budget===b?" sel":"")+'" data-budget="'+esc(b)+'">'+esc(b)+'</button>';
-        }).join("") + '</div>' + navRow("Continue", true);
+        '<p class="fc-q" style="margin-top:20px;font-size:16px">Rough budget <span style="font-weight:400;color:var(--muted);font-size:13px">(optional)</span></p>' +
+        '<div class="optgrid">' + BUDGETS.map(function(b){
+          return opt("budget", b, b, state.budget===b);
+        }).join("") + '</div>';
       break;
 
     case 4: /* contact + consent */
       body.innerHTML =
-        '<p class="fc-step-label">'+stepLabel()+'</p>' +
         '<p class="fc-q">Where should the business reach you?</p>' +
         '<p class="fc-hint">One matched business — call or WhatsApp.</p>' +
         '<div class="field"><label for="f-name">Your name</label>' +
@@ -161,11 +163,31 @@ function render(){
         '<input type="text" name="_gotcha" id="f-gotcha" style="display:none" tabindex="-1" autocomplete="off" />' +
         '<label class="consent" id="consentrow"><input type="checkbox" id="f-consent"'+(state.consent?" checked":"")+' />' +
           '<span>I agree to be contacted by Interior bazzar and one matched interior business about this enquiry, via call/WhatsApp, and to the <a href="https://interiorbazzar.com/privacy-policy" target="_blank" rel="noopener">privacy policy</a>.</span></label>' +
-        '<p class="ferr" id="e-consent">Please tick the box so the business is allowed to contact you.</p>' +
-        navRow("Get my match", true) + privacyNote;
+        '<p class="ferr" id="e-consent">Please tick the box so the business is allowed to contact you.</p>' + privacyNote;
       break;
   }
+  var sub = document.getElementById("fssub");
+  if(sub) sub.textContent = stepQuestion();
+  var foot = document.querySelector(".fs-foot");
+  if(foot) foot.style.display = "";
   wire();
+  updateFoot();
+  var mc = document.querySelector(".fc-body");
+  if(mc) mc.scrollTop = 0;
+}
+
+/* footer Continue: disabled until the step is answered */
+function updateFoot(){
+  var f = document.getElementById("fsnext");
+  if(!f) return;
+  var ok = true, label = "Continue";
+  if(stepIdx===0) ok = !!state.service;
+  if(stepIdx===1) ok = !!state.scope;
+  if(stepIdx===3) ok = !!state.timeline;
+  if(stepIdx===4) label = "Get my match";
+  f.disabled = !ok || submitting;
+  f.innerHTML = submitting ? "Sending…" :
+    esc(label)+' <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 }
 
 /* -------- validation + transitions -------- */
@@ -176,6 +198,8 @@ function err(id, on){
 }
 
 function next(){
+  if(stepIdx===0 && !state.service) return;
+  if(stepIdx===1 && !state.scope) return;
   if(stepIdx===2){
     state.city = (document.getElementById("f-city").value||"").trim();
     state.pincode = (document.getElementById("f-pin").value||"").trim();
@@ -184,17 +208,9 @@ function next(){
     err("city", cityBad); err("pin", pinBad);
     if(cityBad || pinBad) return;
   }
-  if(stepIdx===1 && !state.scope){ flashPills("scope"); return; }
-  if(stepIdx===3 && !state.timeline){ flashPills("timeline"); return; }
+  if(stepIdx===3 && !state.timeline) return;
   if(stepIdx===4){ submit(); return; }
   stepIdx++; render();
-}
-
-function flashPills(kind){
-  body.querySelectorAll("[data-"+kind+"]").forEach(function(p){
-    p.style.borderColor = "var(--err)";
-    setTimeout(function(){ p.style.borderColor = ""; }, 900);
-  });
 }
 
 function wire(){
@@ -203,8 +219,10 @@ function wire(){
       var prev = state.service;
       state.service = b.getAttribute("data-service");
       if(prev !== state.service) state.scope = null; /* stale scope from another service */
+      body.querySelectorAll("[data-service]").forEach(function(x){x.classList.remove("sel");});
+      b.classList.add("sel");
       track("lead_service_pick", {service: state.service});
-      stepIdx = 1; render();
+      updateFoot();
     });
   });
   body.querySelectorAll("[data-scope]").forEach(function(b){
@@ -212,6 +230,7 @@ function wire(){
       state.scope = b.getAttribute("data-scope");
       body.querySelectorAll("[data-scope]").forEach(function(x){x.classList.remove("sel");});
       b.classList.add("sel");
+      updateFoot();
     });
   });
   body.querySelectorAll("[data-timeline]").forEach(function(b){
@@ -219,6 +238,7 @@ function wire(){
       state.timeline = b.getAttribute("data-timeline");
       body.querySelectorAll("[data-timeline]").forEach(function(x){x.classList.remove("sel");});
       b.classList.add("sel");
+      updateFoot();
     });
   });
   body.querySelectorAll("[data-budget]").forEach(function(b){
@@ -229,10 +249,6 @@ function wire(){
       if(state.budget) b.classList.add("sel");
     });
   });
-  var nx = body.querySelector("[data-next]");
-  if(nx) nx.addEventListener("click", next);
-  var bk = body.querySelector("[data-back]");
-  if(bk) bk.addEventListener("click", function(){ if(stepIdx>0){ stepIdx--; render(); } });
   /* Enter advances text steps */
   body.querySelectorAll("input[type=text],input[type=tel]").forEach(function(i){
     i.addEventListener("keydown", function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); next(); } });
@@ -240,7 +256,6 @@ function wire(){
 }
 
 /* -------- submit -------- */
-var submitting = false;
 function submit(){
   if(submitting) return;
   state.name = (document.getElementById("f-name").value||"").trim();
@@ -271,8 +286,7 @@ function submit(){
   Object.keys(UTM).forEach(function(k){ payload[k] = UTM[k]; });
 
   submitting = true;
-  var btn = body.querySelector("[data-next]");
-  if(btn){ btn.disabled = true; btn.textContent = "Sending…"; }
+  updateFoot();
 
   /* fetch() only rejects on network failure — a 4xx/5xx from Formspree resolves,
      so check res.ok explicitly. */
@@ -285,7 +299,7 @@ function submit(){
     onSuccess();
   }).catch(function(){
     submitting = false;
-    if(btn){ btn.disabled = false; btn.textContent = "Get my match"; }
+    updateFoot();
     var e = document.getElementById("e-phone");
     if(e){ e.textContent = "Couldn't send just now — please check your connection and try again."; e.classList.add("show"); }
   });
@@ -294,7 +308,13 @@ function submit(){
 function onSuccess(){
   track("generate_lead", {service: state.service, city: state.city, timeline: state.timeline});
   try{ if(window.fbq) fbq("track","Lead",{content_category: state.service, content_name: "consumer_enquiry"}); }catch(e){}
+  doneShown = true;
+  submitting = false;
   prog.style.width = "100%";
+  var sub = document.getElementById("fssub");
+  if(sub) sub.textContent = "Enquiry received";
+  var foot = document.querySelector(".fs-foot");
+  if(foot) foot.style.display = "none";
   body.innerHTML =
     '<div class="fc-done">' +
       '<span class="big"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>' +
@@ -306,7 +326,7 @@ function onSuccess(){
         '<div><span class="n">3</span><span>The business contacts you on <b>+91 '+esc(state.phone)+'</b> — typically within 1–2 working days.</span></div>' +
       '</div>' + privacyNote +
     '</div>';
-  var mc = document.querySelector(".modal-card");
+  var mc = document.querySelector(".fc-body");
   if(mc) mc.scrollTop = 0;
 }
 
@@ -314,16 +334,14 @@ document.getElementById("yr").textContent = new Date().getFullYear();
 render();
 
 /* =================================================================
-   Enquiry modal — the form lives in a dialog; every CTA opens it
+   Enquiry modal — full-screen app flow; every CTA opens it
    ================================================================= */
 var modal = document.getElementById("modal");
 function openModal(source){
-  render(); /* refresh so prefills (city, service) show */
+  if(!doneShown) render(); /* refresh so prefills (city, service) show */
   modal.classList.add("open");
   modal.setAttribute("aria-hidden","false");
   document.body.classList.add("modal-open");
-  var mc = document.querySelector(".modal-card");
-  if(mc) mc.scrollTop = 0;
   track("form_open", {source: source||"cta", step: stepIdx+1});
 }
 function closeModal(){
@@ -340,6 +358,13 @@ document.querySelectorAll("[data-close-form]").forEach(function(b){
 document.addEventListener("keydown", function(e){
   if(e.key==="Escape" && modal.classList.contains("open")) closeModal();
 });
+
+/* header back: previous step, or close from the first step / done screen */
+document.getElementById("fsback").addEventListener("click", function(){
+  if(doneShown || stepIdx===0){ closeModal(); return; }
+  stepIdx--; render();
+});
+document.getElementById("fsnext").addEventListener("click", next);
 
 /* hero find-now: stash location, open the form */
 (function(){
@@ -359,7 +384,7 @@ document.querySelectorAll(".space[data-svc]").forEach(function(card){
   card.addEventListener("click", function(){
     var id = card.getAttribute("data-svc");
     if(state.service !== id){ state.service = id; state.scope = null; }
-    stepIdx = 1;
+    if(!doneShown) stepIdx = 1;
     track("lead_service_pick", {service: id, source: "spaces"});
     openModal("spaces");
   });

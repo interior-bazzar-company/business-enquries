@@ -70,33 +70,34 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .btn-cream:hover{background:#fff}
 
 /* ---------- enquiry card (multi-step form) ---------- */
-.formcard{background:var(--bone-card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-.fc-head{background:var(--forest);color:#fff;padding:18px 56px 16px 22px;position:relative}
-.fc-head h2{margin:0 0 3px;font-size:18px;font-weight:700;letter-spacing:-.2px}
-.fc-head p{margin:0;font-size:13px;color:#cfe0da}
-.fc-prog{height:5px;background:rgba(255,255,255,.18)}
-.fc-prog i{display:block;height:100%;background:var(--amber);width:0;transition:width .3s ease;border-radius:0 3px 3px 0}
-.fc-body{padding:22px}
-@media(max-width:560px){.fc-body{padding:18px 16px}}
-.fc-step-label{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
-.fc-q{font-size:19px;font-weight:700;color:var(--forest);letter-spacing:-.2px;margin:0 0 4px}
+.formcard{background:var(--bone-card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;max-height:86vh}
+.fs-head{display:flex;align-items:center;gap:12px;padding:12px 52px 12px 12px;background:var(--bone-card);position:relative;flex:none}
+.fs-back{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--bone);display:grid;place-items:center;cursor:pointer;transition:background .15s}
+.fs-back:hover{background:var(--bone-tint)}
+.fs-back:active{transform:scale(.94)}
+.fs-back svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2.2}
+.fs-titles{min-width:0}
+.fs-titles b{display:block;font-size:16.5px;color:var(--ink);letter-spacing:-.2px;line-height:1.2}
+.fs-titles small{display:block;font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-prog{height:3px;background:var(--line);flex:none}
+.fc-prog i{display:block;height:100%;background:var(--forest);width:0;transition:width .3s ease;border-radius:0 3px 3px 0}
+.fc-body{padding:20px 18px;overflow-y:auto;flex:1}
+.fs-foot{flex:none;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--bone-card);border-top:1px solid var(--line)}
+.fs-foot .btn{width:100%;padding:15px}
+.fc-q{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin:0 0 5px}
 .fc-hint{font-size:13px;color:var(--muted);margin:0 0 16px}
 
 /* option cards — one config entry per service, so new services slot in later
    without changing the journey */
 .optgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
-@media(max-width:400px){.optgrid{grid-template-columns:1fr}}
-.optgrid.cols1{grid-template-columns:1fr}
-.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--bone);border:1.5px solid var(--line);border-radius:14px;padding:14px 14px;cursor:pointer;font-size:14.5px;font-weight:600;color:var(--ink);transition:border-color .15s,background .15s}
+.opt{display:flex;align-items:center;gap:9px;text-align:left;background:var(--bone-card);border:1.5px solid var(--line);border-radius:14px;padding:13px 12px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink);transition:border-color .15s,background .15s,transform .12s}
 .opt:hover{border-color:var(--accent)}
+.opt:active{transform:scale(.98)}
 .opt.sel{border-color:var(--forest);background:#eef4f1}
-.opt .oic{flex:none;width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:grid;place-items:center}
-.opt .oic svg{width:20px;height:20px;stroke:var(--forest);fill:none;stroke-width:1.9}
-.opt small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:1px}
-.opt-pill{display:inline-flex;align-items:center;justify-content:center;background:var(--bone);border:1.5px solid var(--line);border-radius:99px;padding:10.5px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink);transition:border-color .15s,background .15s}
-.opt-pill:hover{border-color:var(--accent)}
-.opt-pill.sel{border-color:var(--forest);background:#eef4f1;color:var(--forest)}
-.pillwrap{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 6px}
+.opt .olb{min-width:0}
+.opt .oic{flex:none;width:30px;height:30px;border-radius:9px;background:var(--bone);border:1px solid var(--line);display:grid;place-items:center}
+.opt .oic svg{width:16px;height:16px;stroke:var(--forest);fill:none;stroke-width:1.9}
+.opt.sel .oic{background:#fff}
 
 /* fields */
 .field{margin:0 0 14px}
@@ -229,15 +230,12 @@ body.modal-open{overflow:hidden}
 .modal{position:fixed;inset:0;z-index:100;display:none}
 .modal.open{display:block}
 .modal-ov{position:absolute;inset:0;background:rgba(4,30,24,.6);backdrop-filter:blur(3px)}
-.modal-card{position:relative;z-index:1;max-width:520px;margin:5vh auto 0;max-height:90vh;overflow-y:auto;padding:0 14px;border-radius:var(--r)}
-@media(max-width:560px){.modal-card{margin-top:3vh;max-height:94vh}}
+.modal-card{position:relative;z-index:1;max-width:520px;margin:5vh auto 0;padding:0 14px}
 .modal .formcard{box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
-.modal-x{position:absolute;top:12px;right:26px;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.16);cursor:pointer;display:grid;place-items:center;transition:background .15s}
-.modal-x:hover{background:rgba(255,255,255,.3)}
-.modal-x svg{width:16px;height:16px;stroke:#fff;stroke-width:2.4;fill:none}
+.modal-x{position:absolute;top:50%;transform:translateY(-50%);right:12px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--bone);cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.modal-x:hover{background:var(--bone-tint)}
+.modal-x svg{width:15px;height:15px;stroke:var(--ink);stroke-width:2.2;fill:none}
 
-/* form card sits inside a .sect now — win the h2 fight explicitly */
-.sect .fc-head h2{font-family:"DM Sans",system-ui,sans-serif;font-style:normal;font-weight:700;color:#fff;font-size:18px;letter-spacing:-.2px;text-align:left;margin:0 0 3px}
 
 
 /* =================================================================
@@ -330,14 +328,13 @@ body.modal-open{overflow:hidden}
   .mcta{display:flex;gap:10px;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:19px;padding:9px;box-shadow:0 18px 44px -16px rgba(8,80,65,.55)}
   .mcta .btn{flex:1;border-radius:13px;padding:14px;font-size:15px}
 
-  /* modal — slide-up bottom sheet with grip */
-  .modal-card{position:absolute;left:0;right:0;bottom:0;top:auto;margin:0;max-width:none;max-height:92dvh;padding:0;border-radius:24px 24px 0 0}
-  .modal .formcard{border-radius:24px 24px 0 0;border:0}
-  .modal.open .modal-card{animation:sheetUp .34s cubic-bezier(.22,.9,.34,1)}
-  .fc-head{padding:24px 56px 14px 20px}
-  .fc-head::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:44px;height:4.5px;border-radius:99px;background:rgba(255,255,255,.38)}
-  .modal-x{top:16px;right:16px}
-  .fc-body{padding:18px 16px calc(22px + env(safe-area-inset-bottom))}
+  /* modal — full-screen app flow */
+  .modal-card{position:absolute;inset:0;margin:0;max-width:none;padding:0;border-radius:0}
+  .modal .formcard{border-radius:0;border:0;max-height:none;height:100%}
+  .modal.open .modal-card{animation:sheetUp .3s cubic-bezier(.22,.9,.34,1)}
+  .fs-head{padding:calc(10px + env(safe-area-inset-top)) 16px 10px 12px}
+  .modal-x{display:none} /* header back handles closing */
+  .fc-body{padding:18px 16px 24px}
   .field input{font-size:16px} /* stops iOS focus-zoom */
   .opt{padding:15px 14px}
   .opt:active{transform:scale(.98)}
