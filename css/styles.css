@@ -15,9 +15,7 @@ button{font-family:inherit}
 .topwrap{border-bottom:1px solid var(--line);background:var(--bone-card);position:sticky;top:0;z-index:40}
 .top{max-width:1120px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
-.mark{position:relative;width:40px;height:40px;background:#0b0b0b;border-radius:11px;display:grid;place-items:center;flex:none}
-.mark span{font-family:"DM Serif Display",serif;font-style:italic;color:#fff;font-size:20px;line-height:1;letter-spacing:-1px;transform:translateX(-1px)}
-.mark::after{content:"";position:absolute;top:6px;right:6px;width:10px;height:10px;border-top:2px solid var(--amber);border-right:2px solid var(--amber)}
+.mark{width:40px;height:40px;border-radius:11px;flex:none;display:block}
 .brand b{font-weight:700;font-size:17px;color:var(--forest);letter-spacing:-.2px}
 .gov{font-size:11px;color:var(--muted);text-align:right;line-height:1.35}
 .gov strong{color:var(--forest);font-weight:600}
