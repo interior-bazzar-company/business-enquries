@@ -62,7 +62,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
     </a>
     <div class="topright">
       <div class="gov"><strong>Govt-registered · MSME-certified</strong><br/>Interior services marketplace</div>
-      <a class="btn btn-primary top-cta" href="#enquiry">Start enquiry</a>
+      <button class="btn btn-primary top-cta" type="button" data-open-form>Start enquiry</button>
     </div>
   </div>
 </div>
@@ -95,27 +95,12 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- ============ ENQUIRY FORM ============ -->
-<section class="sect tint formsect" id="enquiry">
-  <div class="wrap">
-    <div class="formwrap">
-      <div class="formcard" id="formcard">
-        <div class="fc-head">
-          <h2>Get matched — it's free</h2>
-          <p>Takes under a minute · One verified business contacts you</p>
-        </div>
-        <div class="fc-prog"><i id="prog"></i></div>
-        <div class="fc-body" id="fcbody"><!-- steps render here --></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ FIND YOUR SPACE ============ -->
-<section class="sect">
+<section class="sect tint">
   <div class="wrap">
-    <p class="eyebrow"><span class="dot"></span> Find your space</p>
-    <h2 class="left">Where do you want to start?</h2>
+    <p class="eyebrow center"><span class="dot"></span> Find your space</p>
+    <h2>Where do you want to start?</h2>
+    <p class="lead">Pick a space to begin — your enquiry takes under a minute.</p>
     <div class="spaces">
       <button type="button" class="space" data-svc="home_interior">
         <img src="assets/img/home.jpg" alt="Warm home interior with wooden dining table" loading="lazy" />
@@ -145,7 +130,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
 </section>
 
 <!-- ============ HOW IT WORKS ============ -->
-<section class="sect tint">
+<section class="sect">
   <div class="wrap">
     <h2>How it works</h2>
     <p class="lead">Three steps — the first two take under a minute.</p>
@@ -164,7 +149,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
 </section>
 
 <!-- ============ WHY ============ -->
-<section class="sect">
+<section class="sect tint">
   <div class="wrap">
     <h2>Why enquire through Interior bazzar</h2>
     <p class="lead">We do the vetting before anyone gets your number.</p>
@@ -182,7 +167,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
 </section>
 
 <!-- ============ FAQ ============ -->
-<section class="sect tint">
+<section class="sect">
   <div class="wrap">
     <h2>Common questions</h2>
     <p class="lead">The short honest answers.</p>
@@ -225,7 +210,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
       <div class="chips">
         <span class="chip">Home</span><span class="chip">Office</span><span class="chip">Renovation</span>
       </div>
-      <a class="btn btn-cream" href="#enquiry">Start my enquiry</a>
+      <button class="btn btn-cream" type="button" data-open-form>Start my enquiry</button>
     </div>
   </div>
 </section>
@@ -251,9 +236,26 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   </div>
 </footer>
 
-<!-- sticky mobile CTA (hidden while the form is on screen) -->
+<!-- sticky mobile CTA -->
 <div class="mcta" id="mcta">
-  <a class="btn btn-primary" href="#enquiry">Get matched — free</a>
+  <button class="btn btn-primary" type="button" data-open-form>Get matched — free</button>
+</div>
+
+<!-- ============ ENQUIRY MODAL ============ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Enquiry form" aria-hidden="true">
+  <div class="modal-ov" data-close-form></div>
+  <div class="modal-card">
+    <div class="formcard" id="formcard">
+      <button class="modal-x" type="button" data-close-form aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="fc-head">
+        <h2>Get matched — it's free</h2>
+        <p>Takes under a minute · One verified business contacts you</p>
+      </div>
+      <div class="fc-prog"><i id="prog"></i></div>
+      <div class="fc-body" id="fcbody"><!-- steps render here --></div>
+    </div>
+  </div>
 </div>
 
 <script src="js/script.js"></script>

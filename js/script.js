@@ -306,24 +306,42 @@ function onSuccess(){
         '<div><span class="n">3</span><span>The business contacts you on <b>+91 '+esc(state.phone)+'</b> — typically within 1–2 working days.</span></div>' +
       '</div>' + privacyNote +
     '</div>';
-  var card = document.getElementById("formcard");
-  if(card) card.scrollIntoView({behavior:"smooth", block:"center"});
+  var mc = document.querySelector(".modal-card");
+  if(mc) mc.scrollTop = 0;
 }
-
-/* -------- mobile sticky CTA: hide while form card is visible -------- */
-(function(){
-  var mcta = document.getElementById("mcta");
-  var card = document.getElementById("formcard");
-  if(!("IntersectionObserver" in window)){ mcta.classList.add("on"); return; }
-  new IntersectionObserver(function(entries){
-    mcta.classList.toggle("on", !entries[0].isIntersecting);
-  }, {threshold: 0.1}).observe(card);
-})();
 
 document.getElementById("yr").textContent = new Date().getFullYear();
 render();
 
-/* -------- hero find-now: stash location, open the form -------- */
+/* =================================================================
+   Enquiry modal — the form lives in a dialog; every CTA opens it
+   ================================================================= */
+var modal = document.getElementById("modal");
+function openModal(source){
+  render(); /* refresh so prefills (city, service) show */
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+  document.body.classList.add("modal-open");
+  var mc = document.querySelector(".modal-card");
+  if(mc) mc.scrollTop = 0;
+  track("form_open", {source: source||"cta", step: stepIdx+1});
+}
+function closeModal(){
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+  document.body.classList.remove("modal-open");
+}
+document.querySelectorAll("[data-open-form]").forEach(function(b){
+  b.addEventListener("click", function(){ openModal("cta"); });
+});
+document.querySelectorAll("[data-close-form]").forEach(function(b){
+  b.addEventListener("click", closeModal);
+});
+document.addEventListener("keydown", function(e){
+  if(e.key==="Escape" && modal.classList.contains("open")) closeModal();
+});
+
+/* hero find-now: stash location, open the form */
 (function(){
   var fr = document.getElementById("findrow");
   if(!fr) return;
@@ -332,18 +350,17 @@ render();
     var v = (document.getElementById("hero-city").value||"").trim();
     if(/^\d{6}$/.test(v)) state.pincode = v; else if(v) state.city = v;
     track("hero_find", {q: v});
-    render(); /* refresh in case the location step is on screen */
-    document.getElementById("enquiry").scrollIntoView({behavior:"smooth"});
+    openModal("hero_find");
   });
 })();
 
-/* -------- space cards: preselect the service, jump into the form -------- */
+/* space cards: preselect the service, open the form at step 2 */
 document.querySelectorAll(".space[data-svc]").forEach(function(card){
   card.addEventListener("click", function(){
     var id = card.getAttribute("data-svc");
     if(state.service !== id){ state.service = id; state.scope = null; }
-    stepIdx = 1; render();
+    stepIdx = 1;
     track("lead_service_pick", {service: id, source: "spaces"});
-    document.getElementById("enquiry").scrollIntoView({behavior:"smooth"});
+    openModal("spaces");
   });
 });

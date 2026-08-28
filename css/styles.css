@@ -63,14 +63,12 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .btn-ghost:hover{background:rgba(8,80,65,.06)}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
 .btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.4}
-.btn-cream{background:var(--cream);color:var(--maroon);border-radius:99px}
+.btn-cream{background:var(--bone);color:var(--forest);border-radius:99px;padding:15px 32px}
 .btn-cream:hover{background:#fff}
 
 /* ---------- enquiry card (multi-step form) ---------- */
-.formsect{padding:40px 0 48px}
-.formwrap{max-width:560px;margin:0 auto}
 .formcard{background:var(--bone-card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-.fc-head{background:var(--forest);color:#fff;padding:18px 22px 16px}
+.fc-head{background:var(--forest);color:#fff;padding:18px 56px 16px 22px;position:relative}
 .fc-head h2{margin:0 0 3px;font-size:18px;font-weight:700;letter-spacing:-.2px}
 .fc-head p{margin:0;font-size:13px;color:#cfe0da}
 .fc-prog{height:5px;background:rgba(255,255,255,.18)}
@@ -138,10 +136,10 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .sect{padding:52px 0}
 .sect.tint{background:var(--bone)}
 .sect h2{font-family:"DM Serif Display",serif;font-style:italic;font-weight:400;color:var(--forest);font-size:clamp(25px,3.8vw,36px);letter-spacing:-.4px;margin:0 0 10px;text-align:center}
-.sect h2.left{text-align:left;margin:0 0 24px}
 .sect .lead{text-align:center;color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 auto 34px}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
 .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.eyebrow.center{display:flex;justify-content:center}
 
 /* how it works */
 .steps3{display:grid;grid-template-columns:1fr;gap:16px}
@@ -186,14 +184,15 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .faq details[open] summary::after{transform:rotate(45deg)}
 .faq .a{font-size:13.5px;color:var(--muted);padding:0 0 16px;max-width:64ch}
 
-/* brand band — customised, lovable space (type-led, maroon) */
-.band{background:var(--maroon);color:var(--cream);padding:60px 0 54px;background-image:radial-gradient(ellipse 60% 90% at 85% 20%,rgba(255,255,255,.06),transparent)}
-.band .kicker{font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e0a9a1;margin:0 0 30px}
-.band h2{font-family:"DM Sans",system-ui,sans-serif;font-style:normal;font-weight:700;font-size:clamp(38px,6.5vw,64px);line-height:1.02;letter-spacing:-2px;color:var(--cream);margin:0 0 16px;text-align:left}
-.band h2 i{font-family:"DM Serif Display",serif;font-weight:400;font-style:italic;letter-spacing:-1px;color:#e8ada2}
-.band .band-sub{color:#e3bcb5;font-size:15px;line-height:1.65;margin:0 0 38px}
-.band-foot{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
-.band .chip{background:transparent;border:1px solid rgba(246,233,229,.4);color:var(--cream)}
+/* brand band — customised, lovable space (type-led, forest) */
+.band{background:var(--forest);color:#eaf2ef;padding:58px 0 54px;text-align:center;background-image:radial-gradient(ellipse 65% 100% at 50% 0%,rgba(255,255,255,.05),transparent)}
+.band .kicker{font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#9fc3b7;margin:0 0 24px}
+.band h2{font-family:"DM Sans",system-ui,sans-serif;font-style:normal;font-weight:700;font-size:clamp(36px,6vw,60px);line-height:1.02;letter-spacing:-2px;color:#fff;margin:0 0 14px;text-align:center}
+.band h2 i{font-family:"DM Serif Display",serif;font-weight:400;font-style:italic;letter-spacing:-1px;color:#e9c288}
+.band .band-sub{color:#b9d2c9;font-size:15px;line-height:1.65;margin:0 0 30px}
+.band-foot{display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center}
+.band .chips{justify-content:center}
+.band .chip{background:transparent;border:1px solid rgba(255,255,255,.35);color:#eaf2ef}
 
 /* footer */
 footer{background:var(--forest-deep);color:#a9c0b8;font-size:12.5px;padding:34px 0 40px}
@@ -207,7 +206,20 @@ footer .fine{border-top:1px solid rgba(255,255,255,.12);padding-top:16px;line-he
 /* sticky mobile cta */
 .mcta{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--bone-card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:none;box-shadow:0 -8px 30px -12px rgba(8,80,65,.25)}
 .mcta .btn{width:100%}
-@media(max-width:919px){.mcta.on{display:block}}
+@media(max-width:919px){.mcta{display:block}}
+body.modal-open .mcta{display:none}
+
+/* enquiry modal */
+body.modal-open{overflow:hidden}
+.modal{position:fixed;inset:0;z-index:100;display:none}
+.modal.open{display:block}
+.modal-ov{position:absolute;inset:0;background:rgba(4,30,24,.6);backdrop-filter:blur(3px)}
+.modal-card{position:relative;z-index:1;max-width:520px;margin:5vh auto 0;max-height:90vh;overflow-y:auto;padding:0 14px;border-radius:var(--r)}
+@media(max-width:560px){.modal-card{margin-top:3vh;max-height:94vh}}
+.modal .formcard{box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+.modal-x{position:absolute;top:12px;right:26px;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.16);cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.modal-x:hover{background:rgba(255,255,255,.3)}
+.modal-x svg{width:16px;height:16px;stroke:#fff;stroke-width:2.4;fill:none}
 
 /* form card sits inside a .sect now — win the h2 fight explicitly */
 .sect .fc-head h2{font-family:"DM Sans",system-ui,sans-serif;font-style:normal;font-weight:700;color:#fff;font-size:18px;letter-spacing:-.2px;text-align:left;margin:0 0 3px}
