@@ -51,7 +51,7 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .findrow .fic{flex:none;display:grid;place-items:center}
 .findrow .fic svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;display:block}
 .findrow input{flex:1;border:0;outline:none;background:transparent;font:inherit;font-size:15px;padding:10px 10px;min-width:0;color:var(--ink)}
-.find-btn{border-radius:99px;padding:12px 24px;flex:none}
+.findrow .find-btn{border-radius:99px;padding:12px 24px;flex:none}
 
 /* small fact chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -270,7 +270,7 @@ body.modal-open{overflow:hidden}
   .sub{font-size:13.5px;margin:0 0 16px}
   .findrow{padding:5px 5px 5px 14px;margin:0 0 12px}
   .findrow input{font-size:16px;padding:12px 8px} /* 16px stops iOS focus-zoom */
-  .find-btn{padding:12px 18px;font-size:14px}
+  .findrow .find-btn{padding:12px 18px;font-size:14px}
   .chip{font-size:11.5px;padding:6px 11px}
 
   /* sections — tighter app rhythm */
@@ -329,9 +329,6 @@ body.modal-open{overflow:hidden}
   /* floating tab bar — call + main CTA */
   .mcta{display:flex;gap:10px;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:19px;padding:9px;box-shadow:0 18px 44px -16px rgba(8,80,65,.55)}
   .mcta .btn{flex:1;border-radius:13px;padding:14px;font-size:15px}
-  .mcall{flex:none;width:52px;border-radius:13px;background:#eef4f1;border:1px solid var(--line);display:grid;place-items:center;text-decoration:none}
-  .mcall:active{transform:scale(.94)}
-  .mcall svg{width:21px;height:21px;stroke:var(--forest);fill:none;stroke-width:2}
 
   /* modal — slide-up bottom sheet with grip */
   .modal-card{position:absolute;left:0;right:0;bottom:0;top:auto;margin:0;max-width:none;max-height:92dvh;padding:0;border-radius:24px 24px 0 0}
