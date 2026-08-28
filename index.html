@@ -64,37 +64,34 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   </div>
 </div>
 
-<!-- ============ HERO ============ -->
+<!-- ============ HERO — photo left, text panel right ============ -->
 <section class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="eyebrow"><span class="dot"></span> Free for you · No obligation</p>
-      <h1>Your interior project, matched with a <span class="u">verified business</span></h1>
-      <p class="sub">Home, commercial or renovation — tell us what you need in under a minute. One verified business for your city contacts you.</p>
-
-      <a class="btn btn-primary hero-mcta" href="#enquiry">Start my enquiry
-        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-
-      <ul class="points">
-        <li><span class="pic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
-          <span><b>Verified businesses only</b> — identity- and registration-checked.</span></li>
-        <li><span class="pic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
-          <span><b>No broadcast</b> — your details go to one matched business, not ten.</span></li>
-        <li><span class="pic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
-          <span><b>Matched on your needs</b> — city, scope and timeline.</span></li>
-      </ul>
-
-      <img class="hero-img" src="assets/img/hero-living.jpg" alt="Warm Indian living room with handwoven throw and cushions" width="1000" height="667" loading="eager" />
-
-      <div class="trust">
-        <span><b>Govt-registered</b> company</span>
-        <span><b>MSME</b>-certified</span>
-        <span>Businesses across <b>India</b></span>
+  <div class="hero-media">
+    <img src="assets/img/hero-living.jpg" alt="Warm living room with handwoven throw and cushions" width="1000" height="667" />
+  </div>
+  <div class="hero-panel">
+    <div class="hero-inner">
+      <span class="pill-eyebrow">Verified interior businesses near you</span>
+      <h1>Get an interior designer at <span class="acc">your location</span></h1>
+      <p class="sub">Share your requirement once. A verified interior business near you responds with plans and quotes.</p>
+      <form class="findrow" id="findrow" autocomplete="off">
+        <span class="fic"><svg viewBox="0 0 24 24"><path d="M12 21C7 16 4 12.5 4 9a8 8 0 1116 0c0 3.5-3 7-8 12z"/><circle cx="12" cy="9" r="2.6"/></svg></span>
+        <input id="hero-city" type="text" placeholder="Enter your city or pincode" autocomplete="address-level2" aria-label="Your city or pincode" />
+        <button class="btn btn-primary find-btn" type="submit">Find now</button>
+      </form>
+      <div class="chips">
+        <span class="chip">Free to enquire</span>
+        <span class="chip">No obligation</span>
+        <span class="chip">Govt-registered · MSME</span>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- form column -->
-    <div class="form-col" id="enquiry">
+<!-- ============ ENQUIRY FORM ============ -->
+<section class="sect tint formsect" id="enquiry">
+  <div class="wrap">
+    <div class="formwrap">
       <div class="formcard" id="formcard">
         <div class="fc-head">
           <h2>Get matched — it's free</h2>
@@ -108,7 +105,7 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
 </section>
 
 <!-- ============ HOW IT WORKS ============ -->
-<section class="sect tint">
+<section class="sect">
   <div class="wrap">
     <h2>How it works</h2>
     <p class="lead">Three steps — the first two take under a minute.</p>
@@ -144,30 +141,41 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- ============ CATEGORIES ============ -->
+<!-- ============ FIND YOUR SPACE ============ -->
 <section class="sect tint">
   <div class="wrap">
-    <h2>Projects we match every week</h2>
-    <p class="lead">From a single-room refresh to a full commercial fit-out.</p>
-    <div class="tiles">
-      <figure class="tile">
-        <img src="assets/img/home.jpg" alt="Warm home interior with wooden dining table and open shelves" loading="lazy" />
-        <figcaption><b>Home interiors</b><span>Living · dining · bedrooms · wardrobes</span></figcaption>
-      </figure>
-      <figure class="tile">
-        <img src="assets/img/commercial.jpg" alt="Modern Indian office cabin with wooden desk" loading="lazy" />
-        <figcaption><b>Commercial spaces</b><span>Office · retail · café · clinic</span></figcaption>
-      </figure>
-      <figure class="tile">
-        <img src="assets/img/kitchen.jpg" alt="Modular kitchen with wooden countertop and white cabinets" loading="lazy" />
-        <figcaption><b>Renovation</b><span>Kitchen · bathroom · full home</span></figcaption>
-      </figure>
+    <p class="eyebrow"><span class="dot"></span> Find your space</p>
+    <h2 class="left">Where do you want to start?</h2>
+    <div class="spaces">
+      <button type="button" class="space" data-svc="home_interior">
+        <img src="assets/img/home.jpg" alt="Warm home interior with wooden dining table" loading="lazy" />
+        <span class="scap"><b>Home</b><small>Living · kitchen · bedrooms</small></span>
+      </button>
+      <button type="button" class="space" data-svc="renovation">
+        <img src="assets/img/kitchen.jpg" alt="Modular kitchen with wooden worktop" loading="lazy" />
+        <span class="scap"><b>Renovation</b><small>Kitchen · bathroom · full home</small></span>
+      </button>
+      <button type="button" class="space" data-svc="commercial_space">
+        <img src="assets/img/commercial.jpg" alt="Modern Indian office cabin" loading="lazy" />
+        <span class="scap"><b>Office</b><small>Cabin · workspace · reception</small></span>
+      </button>
+      <button type="button" class="space" data-svc="commercial_space">
+        <img src="assets/img/cafe.jpg" alt="Cozy café interior with wooden beams" loading="lazy" />
+        <span class="scap"><b>Café / Restaurant</b><small>Dining · counters · ambience</small></span>
+      </button>
+      <button type="button" class="space dark" data-svc="business_designer">
+        <span class="dcap">
+          <b>Designer for my business</b>
+          <small>Full-time, project-based or drawing support.</small>
+          <span class="btn-mini">Get matched</span>
+        </span>
+      </button>
     </div>
   </div>
 </section>
 
 <!-- ============ FAQ ============ -->
-<section class="sect">
+<section class="sect tint">
   <div class="wrap">
     <h2>Common questions</h2>
     <p class="lead">The short honest answers.</p>
@@ -200,13 +208,18 @@ src="https://www.facebook.com/tr?id=1739751447041999&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- ============ BOTTOM CTA ============ -->
+<!-- ============ BRAND BAND — customised, lovable space ============ -->
 <section class="band">
   <div class="wrap">
-    <h2>Ready when you are</h2>
-    <p>One minute of questions. One verified business. Zero cost to you.</p>
-    <a class="btn btn-primary" href="#enquiry" data-scrolltop>Start my enquiry
-      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <p class="kicker">For the way you live</p>
+    <h2>customised, <i>lovable</i> space</h2>
+    <p class="band-sub">Party on Friday, family dinner on Saturday, quiet on Sunday.<br/>One space, many lives — designed for all of them.</p>
+    <div class="band-foot">
+      <div class="chips">
+        <span class="chip">Home</span><span class="chip">Office</span><span class="chip">Renovation</span>
+      </div>
+      <a class="btn btn-cream" href="#enquiry">Start my enquiry</a>
+    </div>
   </div>
 </section>
 

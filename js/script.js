@@ -322,3 +322,28 @@ function onSuccess(){
 
 document.getElementById("yr").textContent = new Date().getFullYear();
 render();
+
+/* -------- hero find-now: stash location, open the form -------- */
+(function(){
+  var fr = document.getElementById("findrow");
+  if(!fr) return;
+  fr.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = (document.getElementById("hero-city").value||"").trim();
+    if(/^\d{6}$/.test(v)) state.pincode = v; else if(v) state.city = v;
+    track("hero_find", {q: v});
+    render(); /* refresh in case the location step is on screen */
+    document.getElementById("enquiry").scrollIntoView({behavior:"smooth"});
+  });
+})();
+
+/* -------- space cards: preselect the service, jump into the form -------- */
+document.querySelectorAll(".space[data-svc]").forEach(function(card){
+  card.addEventListener("click", function(){
+    var id = card.getAttribute("data-svc");
+    if(state.service !== id){ state.service = id; state.scope = null; }
+    stepIdx = 1; render();
+    track("lead_service_pick", {service: id, source: "spaces"});
+    document.getElementById("enquiry").scrollIntoView({behavior:"smooth"});
+  });
+});
