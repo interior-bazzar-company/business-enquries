@@ -5,7 +5,7 @@
   --ink:#1c2420; --muted:#5c665f; --line:#e2dccf; --err:#b3261e; --wa:#25D366;
   --r:18px; --shadow:0 18px 50px -22px rgba(8,80,65,.35);
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bone-card);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px} /* matches .top so hero edges align with logo and button */
@@ -17,6 +17,7 @@ button{font-family:inherit}
 .top{max-width:1120px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
 .mark{width:40px;height:40px;border-radius:11px;flex:none;display:block}
+.m-greet{display:none}
 .brandtxt{display:flex;flex-direction:column;line-height:1.2}
 .brand b{font-weight:700;font-size:17px;color:#0b0b0b;letter-spacing:-.2px}
 .brandtxt small{font-size:11px;font-weight:500;color:#4a4a4a;letter-spacing:.01em;margin-top:1px}
@@ -168,6 +169,8 @@ h1 .acc{font-style:italic;color:var(--accent)}
 .spaces{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(190px,1fr);gap:14px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
 @media(min-width:880px){.spaces{grid-auto-flow:row;grid-auto-columns:unset;grid-template-columns:repeat(5,1fr);overflow:visible;gap:12px}.space{height:250px}}
 .space{scroll-snap-align:start;position:relative;border:0;padding:0;cursor:pointer;border-radius:16px;overflow:hidden;height:260px;background:var(--forest-deep);text-align:left}
+.space{transition:transform .14s}
+.space:active{transform:scale(.97)}
 .space img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .35s}
 .space:hover img{transform:scale(1.05)}
 .space .scap{position:absolute;left:0;right:0;bottom:0;padding:44px 14px 16px;background:linear-gradient(transparent,rgba(0,0,0,.74));color:#fff}
@@ -218,10 +221,8 @@ footer .links{display:flex;flex-wrap:wrap;gap:8px 20px}
 footer .fine{border-top:1px solid var(--line);padding-top:16px;line-height:1.6;font-size:11.5px;color:#8f978f;max-width:74ch}
 
 /* sticky mobile cta */
-.mcta{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--bone-card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:none;box-shadow:0 -8px 30px -12px rgba(8,80,65,.25)}
-.mcta .btn{width:100%}
-@media(max-width:919px){.mcta{display:block}}
-body.modal-open .mcta{display:none}
+.mcta{display:none}
+body.modal-open .mcta{display:none!important}
 
 /* enquiry modal */
 body.modal-open{overflow:hidden}
@@ -237,3 +238,113 @@ body.modal-open{overflow:hidden}
 
 /* form card sits inside a .sect now — win the h2 fight explicitly */
 .sect .fc-head h2{font-family:"DM Sans",system-ui,sans-serif;font-style:normal;font-weight:700;color:#fff;font-size:18px;letter-spacing:-.2px;text-align:left;margin:0 0 3px}
+
+
+/* =================================================================
+   MOBILE APP LAYER — phones are the primary device for this funnel,
+   so under 880px the page behaves like a native app: translucent app
+   bar, tile grid, order-tracking timeline, grouped list cards,
+   floating tab bar, and the form as a slide-up bottom sheet.
+   ================================================================= */
+@media(max-width:879px){
+  body{font-size:15px}
+  .wrap{padding:0 16px}
+
+  /* app bar — translucent with blur */
+  .topwrap{background:rgba(255,255,255,.86);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px)}
+  .top{padding:10px 16px}
+  .mark{width:36px;height:36px;border-radius:10px}
+  .brand b{font-size:15.5px}
+  .brandtxt small{font-size:10px}
+  .top-cta{padding:9px 15px;font-size:13px;border-radius:99px}
+
+  /* hero — app home card with a search bar people know from delivery apps */
+  .herosect{padding:12px 0 6px}
+  .hero{border-radius:22px;box-shadow:0 14px 34px -22px rgba(8,80,65,.45)}
+  .hero-media{min-height:186px}
+  .hero-panel{padding:20px 18px 22px}
+  .pill-eyebrow{display:none}
+  .m-greet{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--forest);background:#eef4f1;border:1px solid rgba(8,80,65,.14);border-radius:99px;padding:6px 13px;margin:0 0 12px}
+  .m-greet b{font-weight:700}
+  h1{font-size:26px;line-height:1.12;margin:0 0 10px}
+  .sub{font-size:13.5px;margin:0 0 16px}
+  .findrow{padding:5px 5px 5px 14px;margin:0 0 12px}
+  .findrow input{font-size:16px;padding:12px 8px} /* 16px stops iOS focus-zoom */
+  .find-btn{padding:12px 18px;font-size:14px}
+  .chip{font-size:11.5px;padding:6px 11px}
+
+  /* sections — tighter app rhythm */
+  .sect{padding:34px 0}
+  .sect h2{font-size:23px}
+  .sect h2::after{margin-top:10px;transform:scale(.88)}
+  .sect .lead{font-size:13.5px;margin:0 auto 20px}
+  .eyebrow{font-size:11px}
+
+  /* service tiles — 2-up app grid, business card full-width */
+  .spaces{grid-auto-flow:row;grid-template-columns:1fr 1fr;gap:12px;overflow:visible;padding:0 0 4px}
+  .space{height:150px;border-radius:18px}
+  .space .scap{padding:28px 12px 10px}
+  .scap b{font-size:14px}
+  .scap small{font-size:10.5px}
+  .space.dark{grid-column:1/-1;height:auto;min-height:150px}
+  .dcap{padding:15px 16px}
+  .dcap b{font-size:15.5px}
+
+  /* how it works — order-tracking style vertical timeline */
+  .steps3{display:block;position:relative;padding-left:2px}
+  .steps3::before{content:"";position:absolute;left:18px;top:10px;bottom:26px;width:2px;background:linear-gradient(var(--accent) 60%,var(--line))}
+  .step3{background:transparent;border:0;border-radius:0;padding:0 0 24px 52px;position:relative}
+  .step3:last-child{padding-bottom:0}
+  .step3 .num{position:absolute;left:2px;top:0;margin:0;box-shadow:0 0 0 5px var(--bone-card)}
+  .step3 h3{font-size:15px;margin-bottom:4px}
+  .step3 p{font-size:12.5px}
+
+  /* why — grouped settings-style list card */
+  .whygrid{display:block;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bone-card);box-shadow:0 12px 28px -20px rgba(8,80,65,.35)}
+  .why{border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:15px 16px}
+  .why:last-child{border-bottom:0}
+  .why:hover{transform:none;box-shadow:none}
+  .why .wic{width:40px;height:40px;border-radius:12px}
+  .why h3{font-size:14.5px}
+  .why p{font-size:12.5px}
+
+  /* faq — grouped list card */
+  .faq{gap:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bone-card)}
+  .faq details{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 16px}
+  .faq details:last-child{border-bottom:0}
+  .faq summary{font-size:13.5px;padding:15px 0}
+  .faq .a{font-size:12.5px}
+
+  /* brand band — compact */
+  .band{padding:40px 0 38px}
+  .band .kicker{font-size:10px;margin-bottom:14px}
+  .band h2{font-size:33px;letter-spacing:-1.2px}
+  .band .band-sub{font-size:13px;margin-bottom:24px}
+  .band-foot{gap:14px}
+  .btn-cream{width:100%;max-width:340px}
+
+  /* footer clears the floating bar */
+  footer{padding:26px 0 118px;font-size:12px}
+
+  /* floating tab bar — call + main CTA */
+  .mcta{display:flex;gap:10px;position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:19px;padding:9px;box-shadow:0 18px 44px -16px rgba(8,80,65,.55)}
+  .mcta .btn{flex:1;border-radius:13px;padding:14px;font-size:15px}
+  .mcall{flex:none;width:52px;border-radius:13px;background:#eef4f1;border:1px solid var(--line);display:grid;place-items:center;text-decoration:none}
+  .mcall:active{transform:scale(.94)}
+  .mcall svg{width:21px;height:21px;stroke:var(--forest);fill:none;stroke-width:2}
+
+  /* modal — slide-up bottom sheet with grip */
+  .modal-card{position:absolute;left:0;right:0;bottom:0;top:auto;margin:0;max-width:none;max-height:92dvh;padding:0;border-radius:24px 24px 0 0}
+  .modal .formcard{border-radius:24px 24px 0 0;border:0}
+  .modal.open .modal-card{animation:sheetUp .34s cubic-bezier(.22,.9,.34,1)}
+  .fc-head{padding:24px 56px 14px 20px}
+  .fc-head::before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:44px;height:4.5px;border-radius:99px;background:rgba(255,255,255,.38)}
+  .modal-x{top:16px;right:16px}
+  .fc-body{padding:18px 16px calc(22px + env(safe-area-inset-bottom))}
+  .field input{font-size:16px} /* stops iOS focus-zoom */
+  .opt{padding:15px 14px}
+  .opt:active{transform:scale(.98)}
+  .opt-pill:active{transform:scale(.95)}
+  .fc-nav .btn{padding:15px}
+}
+@keyframes sheetUp{from{transform:translateY(45%);opacity:.35}to{transform:translateY(0);opacity:1}}
