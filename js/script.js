@@ -7,6 +7,44 @@
    ================================================================= */
 var ENDPOINT = "https://formspree.io/f/mzebbbej";
 
+/* The enquiry itself, into the platform. Formspree stays an INBOX; this is the
+   pipeline -- one LeadQuery row, which is what puts the enquiry in the admin
+   Business Enquiries queue where it gets scored, qualified and matched to a
+   verified business. Formspree alone reached none of that.
+
+   The SHARED public enquiry door, not a funnel-only one: every form on the site
+   posts here, and a second endpoint would be a second set of rules to keep in
+   step with the first.
+
+   PROD IS THE ONE THAT COUNTS -- it is the queue somebody actually works.
+   LEAD_API_TEST is a copy of the same submission to dev so the flow stays
+   observable there while this is being worked on; nothing is read back off it
+   and its failure is invisible. Same arrangement the premium funnel runs.
+   NOTE that this doubles every real enquiry into the dev database: dev's
+   Business Enquiries queue will carry a copy of every live lead, so it is no
+   longer a clean environment to demo from. Drop LEAD_API_TEST from TARGETS
+   when the mirror has served its purpose. */
+var LEAD_API       = "https://prod.interiorbazzar.com/api/v1/query/create/";
+var LEAD_API_TEST  = "https://dev.interiorbazzar.com/api/v1/query/create/";
+var LEAD_API_LOCAL = "http://127.0.0.1:8000/api/v1/query/create/";
+
+/* Served from a laptop, or from the internet. Decided from the HOST rather than
+   by editing a URL and remembering to change it back -- a localhost URL that
+   reached Netlify would drop every real enquiry on the floor, silently, because
+   these POSTs are fire-and-forget and nothing would report the failure.
+   Empty hostname is a file:// open, which is a local checkout too. */
+function isLocal(){
+  var h = location.hostname;
+  return !h || h === "localhost" || h === "127.0.0.1" || h === "[::1]";
+}
+
+/* A local checkout talks ONLY to the local backend -- it must never reach prod,
+   and mirroring a developer's test typing into dev is the same noise this
+   mirror exists to avoid. */
+function leadTargets(){
+  return isLocal() ? [LEAD_API_LOCAL] : [LEAD_API, LEAD_API_TEST];
+}
+
 var ICONS = {
   home:   '<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>',
   office: '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg>',
@@ -38,6 +76,17 @@ var SERVICES = [
 ];
 
 var TIMELINES = ["Ready to start now","Within 1 month","In 1–3 months","Just exploring"];
+
+/* Our wording -> the four bands LeadQuery.timeline stores. LOAD-BEARING: the
+   backend takes a key from this list and nothing else, and the band it lands in
+   is the urgency signal the enquiry is scored on. Rename an option above and
+   this map has to follow it. */
+var TIMELINE_KEY = {
+  "Ready to start now": "30d",
+  "Within 1 month":     "30d",
+  "In 1–3 months":      "90d",
+  "Just exploring":     "browsing"
+};
 var BUDGETS   = ["Under ₹1 lakh","₹1–3 lakh","₹3–10 lakh","₹10 lakh+","Not decided yet"];
 
 /* =================================================================
@@ -70,6 +119,11 @@ var stepIdx = 0;
 var TOTAL_STEPS = 5;
 var submitting = false;
 var doneShown = false;
+/* The enquiry is created ONCE per visitor, not once per attempt. A failed
+   Formspree POST puts the visitor back on the form with a retry button, and
+   the enquiry is already in the pipeline by then -- without this, every
+   retry files another copy of the same person against the same number. */
+var leadSent = false;
 var body = document.getElementById("fcbody");
 var prog = document.getElementById("prog");
 var maxStepSeen = -1;
@@ -255,6 +309,57 @@ function wire(){
   });
 }
 
+/* Create the enquiry in the platform. FIRE-AND-FORGET on purpose: nothing here
+   comes back that the visitor needs, and the success screen must not wait on --
+   or be broken by -- an API that is slow or down. Formspree stays the call that
+   decides what the visitor sees, exactly as before.
+
+   ONLY the answers with somewhere real to live are sent. Consent, the page URL,
+   the subject line and the UTMs have no column and stay in the Formspree
+   payload, which keeps carrying all of it. */
+function createLead(gotcha){
+  var s = svc() || {};
+  var lead = {
+    name:  state.name,
+    /* BARE 10 DIGITS. Formspree gets "+91..." below; this endpoint refuses a
+       non-digit outright, and anything that is not exactly ten digits is
+       quarantined as a fake number. */
+    phone: state.phone,
+    city:  state.city,
+    category:    s.label || "",
+    projectType: state.scope || "",
+    /* What the seller sees once the enquiry is matched out to them. Either half
+       alone reads wrong there -- "2 BHK" names no service, "Home interior" no
+       size. */
+    interested:  (s.label || "") + (state.scope ? " · " + state.scope : ""),
+    pincode:     /^\d{6}$/.test(state.pincode) ? state.pincode : "",
+    timeline:    TIMELINE_KEY[state.timeline] || "",
+    /* Budget is a real answer with no column of its own, so it goes in the
+       enquiry text -- the field the panel's requirement block renders, and one
+       of the inputs the enquiry is scored on. */
+    query:       state.budget ? "Budget: " + state.budget : "",
+    /* Which page it came from. The panel derives the rest of the provenance
+       from this and shows "Funnel page · business-enquries". */
+    sourceChannel: "business-enquries",
+    _gotcha: gotcha
+  };
+  /* Every target gets the SAME body, each in its own try/catch so one dead host
+     cannot stop the next -- and none of them awaited, because nothing here comes
+     back that the visitor needs. keepalive so the POST survives the page moving
+     on to the success screen. */
+  var body = JSON.stringify(lead);
+  leadTargets().forEach(function(url){
+    try{
+      fetch(url, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+        body: body,
+        keepalive: true
+      }).catch(function(){});
+    }catch(e){}
+  });
+}
+
 /* -------- submit -------- */
 function submit(){
   if(submitting) return;
@@ -288,13 +393,29 @@ function submit(){
   submitting = true;
   updateFoot();
 
+  if(!leadSent){ leadSent = true; createLead(gotcha); }
+
+  /* Formspree is a real, shared inbox -- a local checkout filling this form ten
+     times while somebody works on it would put ten fake enquiries in front of
+     whoever reads it. So on localhost the POST is skipped and RESOLVED, which
+     still runs the success screen and the conversion events below. Said out loud
+     in the console rather than skipped quietly, so nobody debugs a missing
+     Formspree entry that was never sent. */
+  var sent;
+  if(isLocal()){
+    console.log("[local] Formspree POST skipped; payload:", payload);
+    sent = Promise.resolve({ ok: true });
+  } else {
+    sent = fetch(ENDPOINT, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(payload)
+    });
+  }
+
   /* fetch() only rejects on network failure — a 4xx/5xx from Formspree resolves,
      so check res.ok explicitly. */
-  fetch(ENDPOINT, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json", "Accept":"application/json" },
-    body: JSON.stringify(payload)
-  }).then(function(res){
+  sent.then(function(res){
     if(!res.ok) throw new Error("formspree "+res.status);
     onSuccess();
   }).catch(function(){
