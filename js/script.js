@@ -183,10 +183,10 @@ function render(){
         '<p class="fc-hint">We match you with a business that serves your area.</p>' +
         '<div class="field"><label for="f-city">City</label>' +
           '<input id="f-city" type="text" autocomplete="address-level2" placeholder="e.g. Indore" value="'+esc(state.city)+'" />' +
-          '<p class="ferr" id="e-city">Please enter your city.</p></div>' +
+          '<p class="ferr" id="e-city">Please enter a real city name.</p></div>' +
         '<div class="field"><label for="f-pin">Pincode <span class="optional">(optional, sharpens the match)</span></label>' +
           '<input id="f-pin" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit pincode" value="'+esc(state.pincode)+'" />' +
-          '<p class="ferr" id="e-pin">Pincode should be 6 digits.</p></div>';
+          '<p class="ferr" id="e-pin">Enter a real 6-digit pincode.</p></div>';
       break;
 
     case 3: /* timeline + budget */
@@ -208,7 +208,7 @@ function render(){
         '<p class="fc-hint">One matched business — call or WhatsApp.</p>' +
         '<div class="field"><label for="f-name">Your name</label>' +
           '<input id="f-name" type="text" autocomplete="name" placeholder="Full name" value="'+esc(state.name)+'" />' +
-          '<p class="ferr" id="e-name">Please enter your name.</p></div>' +
+          '<p class="ferr" id="e-name">Please enter your full name.</p></div>' +
         '<div class="field"><label for="f-phone">Mobile number</label>' +
           '<div class="phonewrap"><span class="cc">+91</span>' +
           '<input id="f-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile" value="'+esc(state.phone)+'" /></div>' +
@@ -244,6 +244,64 @@ function updateFoot(){
     esc(label)+' <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 }
 
+/* -------- input sanity --------
+   Stops junk reaching sales: keyboard mash in the text fields, and numbers
+   that pass a digit count but were never real. A filter, not a proof --
+   someone determined still types "abcd" and gets through. */
+function allSame(w){
+  for(var i=1;i<w.length;i++) if(w[i]!==w[0]) return false;
+  return true;
+}
+function tripled(w){
+  for(var i=2;i<w.length;i++) if(w[i]===w[i-1] && w[i]===w[i-2]) return true;
+  return false;
+}
+/* doubled ladders so wrap-arounds like 6789012345 count as runs too */
+var ASC="01234567890123456789", DESC="98765432109876543210";
+function runOrRepeat(d){
+  return allSame(d) || ASC.indexOf(d)>-1 || DESC.indexOf(d)>-1;
+}
+/* Real words written in Latin script carry a vowel, never run a letter three
+   times, and are not a slice of one keyboard row. Catches asdf / qwerty /
+   sdfgh / aaaa without shipping a dictionary. */
+var ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"];
+function mash(v){
+  var w=String(v).toLowerCase().replace(/[^a-z]/g,"");
+  if(w.length<2) return true;
+  if(!/[aeiou]/.test(w)) return true;
+  if(tripled(w)) return true;
+  return ROWS.some(function(r){ return r.indexOf(w)>-1; });
+}
+/* People's names: letters plus the joiners real names use -- no digits, no
+   symbols, so "Name 123" and "..." are not names. */
+function nameOk(v){
+  v=String(v||"").trim();
+  return v.length>=2 && v.length<=40 &&
+    /^[A-Za-zÀ-ɏ][A-Za-zÀ-ɏ .'-]*$/.test(v) && !mash(v);
+}
+/* No whitelist -- the market is tier-2 towns we have never heard of. */
+function cityOk(v){
+  v=String(v||"").trim();
+  return v.length>=3 && v.length<=30 &&
+    /^[A-Za-zÀ-ɏ][A-Za-zÀ-ɏ -]*$/.test(v) && !mash(v);
+}
+/* Indian PINs are 6 digits and never start 0. 111111 and 123456 are not PINs. */
+function pinOk(v){
+  v=String(v||"").trim();
+  return /^[1-9]\d{5}$/.test(v) && !runOrRepeat(v);
+}
+/* People paste +91, 0091 and leading zeros -- strip those rather than
+   rejecting a number that is perfectly valid underneath. */
+function mobile10(v){
+  var d=String(v||"").replace(/\D/g,"").replace(/^0+/,"");
+  if(d.length>10 && d.indexOf("91")===0) d=d.slice(2);
+  return d;
+}
+function phoneOk(v){
+  var d=mobile10(v);
+  return /^[6-9]\d{9}$/.test(d) && !runOrRepeat(d);
+}
+
 /* -------- validation + transitions -------- */
 function err(id, on){
   var e = document.getElementById("e-"+id), f = document.getElementById("f-"+id);
@@ -257,8 +315,8 @@ function next(){
   if(stepIdx===2){
     state.city = (document.getElementById("f-city").value||"").trim();
     state.pincode = (document.getElementById("f-pin").value||"").trim();
-    var cityBad = state.city.length < 2;
-    var pinBad = state.pincode !== "" && !/^\d{6}$/.test(state.pincode);
+    var cityBad = !cityOk(state.city);
+    var pinBad = state.pincode !== "" && !pinOk(state.pincode);
     err("city", cityBad); err("pin", pinBad);
     if(cityBad || pinBad) return;
   }
@@ -332,7 +390,7 @@ function createLead(gotcha){
        alone reads wrong there -- "2 BHK" names no service, "Home interior" no
        size. */
     interested:  (s.label || "") + (state.scope ? " · " + state.scope : ""),
-    pincode:     /^\d{6}$/.test(state.pincode) ? state.pincode : "",
+    pincode:     pinOk(state.pincode) ? state.pincode : "",
     timeline:    TIMELINE_KEY[state.timeline] || "",
     /* Budget is a real answer with no column of its own, so it goes in the
        enquiry text -- the field the panel's requirement block renders, and one
@@ -364,10 +422,10 @@ function createLead(gotcha){
 function submit(){
   if(submitting) return;
   state.name = (document.getElementById("f-name").value||"").trim();
-  state.phone = (document.getElementById("f-phone").value||"").replace(/\D/g,"");
+  state.phone = mobile10(document.getElementById("f-phone").value);
   state.consent = document.getElementById("f-consent").checked;
-  var nameBad = state.name.length < 2;
-  var phoneBad = !/^[6-9]\d{9}$/.test(state.phone);
+  var nameBad = !nameOk(state.name);
+  var phoneBad = !phoneOk(state.phone);
   err("name", nameBad); err("phone", phoneBad); err("consent", !state.consent);
   document.getElementById("consentrow").classList.toggle("bad", !state.consent);
   if(nameBad || phoneBad || !state.consent) return;
@@ -494,7 +552,7 @@ document.getElementById("fsnext").addEventListener("click", next);
   fr.addEventListener("submit", function(e){
     e.preventDefault();
     var v = (document.getElementById("hero-city").value||"").trim();
-    if(/^\d{6}$/.test(v)) state.pincode = v; else if(v) state.city = v;
+    if(pinOk(v)) state.pincode = v; else if(v) state.city = v;
     track("hero_find", {q: v});
     openModal("hero_find");
   });
