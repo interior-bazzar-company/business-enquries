@@ -113,8 +113,8 @@ try{
    subtitle, option grid in the body, sticky Continue in the footer
    that stays disabled until the step is answered.
    ================================================================= */
-var state = { service:null, scope:null, city:"", pincode:"", timeline:null, budget:null,
-              name:"", phone:"", consent:false };
+var state = { service:null, scope:null, city:"", pincode:"", size:"", timeline:null, budget:null,
+              name:"", phone:"", message:"", consent:false };
 var stepIdx = 0;
 var TOTAL_STEPS = 5;
 var submitting = false;
@@ -186,7 +186,9 @@ function render(){
           '<p class="ferr" id="e-city">Please enter a real city name.</p></div>' +
         '<div class="field"><label for="f-pin">Pincode <span class="optional">(optional, sharpens the match)</span></label>' +
           '<input id="f-pin" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit pincode" value="'+esc(state.pincode)+'" />' +
-          '<p class="ferr" id="e-pin">Enter a real 6-digit pincode.</p></div>';
+          '<p class="ferr" id="e-pin">Enter a real 6-digit pincode.</p></div>' +
+        '<div class="field"><label for="f-size">Size of your space <span class="optional">(optional)</span></label>' +
+          '<input id="f-size" type="text" placeholder="e.g. 2 BHK, or 1200 sq ft" value="'+esc(state.size)+'" /></div>';
       break;
 
     case 3: /* timeline + budget */
@@ -213,6 +215,8 @@ function render(){
           '<div class="phonewrap"><span class="cc">+91</span>' +
           '<input id="f-phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile" value="'+esc(state.phone)+'" /></div>' +
           '<p class="ferr" id="e-phone">Enter a valid 10-digit Indian mobile number.</p></div>' +
+        '<div class="field"><label for="f-msg">Anything else you\'d like to tell us? <span class="optional">(optional)</span></label>' +
+          '<textarea id="f-msg" rows="3" placeholder="e.g. Need full home interior, want a modern look, must finish before Diwali">'+esc(state.message)+'</textarea></div>' +
         /* honeypot — hidden from humans, bots fill it */
         '<input type="text" name="_gotcha" id="f-gotcha" style="display:none" tabindex="-1" autocomplete="off" />' +
         '<label class="consent" id="consentrow"><input type="checkbox" id="f-consent"'+(state.consent?" checked":"")+' />' +
@@ -315,6 +319,7 @@ function next(){
   if(stepIdx===2){
     state.city = (document.getElementById("f-city").value||"").trim();
     state.pincode = (document.getElementById("f-pin").value||"").trim();
+    state.size = (document.getElementById("f-size").value||"").trim();
     var cityBad = !cityOk(state.city);
     var pinBad = state.pincode !== "" && !pinOk(state.pincode);
     err("city", cityBad); err("pin", pinBad);
@@ -423,6 +428,7 @@ function submit(){
   if(submitting) return;
   state.name = (document.getElementById("f-name").value||"").trim();
   state.phone = mobile10(document.getElementById("f-phone").value);
+  state.message = (document.getElementById("f-msg").value||"").trim();
   state.consent = document.getElementById("f-consent").checked;
   var nameBad = !nameOk(state.name);
   var phoneBad = !phoneOk(state.phone);
@@ -437,10 +443,12 @@ function submit(){
     scope: state.scope,
     city: state.city,
     pincode: state.pincode || "(not given)",
+    size: state.size || "(not given)",
     timeline: state.timeline,
     budget: state.budget || "(not given)",
     name: state.name,
     phone: "+91" + state.phone,
+    message: state.message || "(not given)",
     consent: "yes",
     page: location.href.split("?")[0],
     _gotcha: gotcha,
