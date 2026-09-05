@@ -113,7 +113,7 @@ try{
    subtitle, option grid in the body, sticky Continue in the footer
    that stays disabled until the step is answered.
    ================================================================= */
-var state = { service:null, scope:null, city:"", pincode:"", size:"", timeline:null, budget:null,
+var state = { service:null, scope:null, city:"", pincode:"", timeline:null, budget:null,
               name:"", phone:"", message:"", consent:false };
 var stepIdx = 0;
 var TOTAL_STEPS = 5;
@@ -186,9 +186,7 @@ function render(){
           '<p class="ferr" id="e-city">Please enter a real city name.</p></div>' +
         '<div class="field"><label for="f-pin">Pincode <span class="optional">(optional, sharpens the match)</span></label>' +
           '<input id="f-pin" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit pincode" value="'+esc(state.pincode)+'" />' +
-          '<p class="ferr" id="e-pin">Enter a real 6-digit pincode.</p></div>' +
-        '<div class="field"><label for="f-size">Size of your space <span class="optional">(optional)</span></label>' +
-          '<input id="f-size" type="text" placeholder="e.g. 2 BHK, or 1200 sq ft" value="'+esc(state.size)+'" /></div>';
+          '<p class="ferr" id="e-pin">Enter a real 6-digit pincode.</p></div>';
       break;
 
     case 3: /* timeline + budget */
@@ -319,7 +317,6 @@ function next(){
   if(stepIdx===2){
     state.city = (document.getElementById("f-city").value||"").trim();
     state.pincode = (document.getElementById("f-pin").value||"").trim();
-    state.size = (document.getElementById("f-size").value||"").trim();
     var cityBad = !cityOk(state.city);
     var pinBad = state.pincode !== "" && !pinOk(state.pincode);
     err("city", cityBad); err("pin", pinBad);
@@ -443,7 +440,6 @@ function submit(){
     scope: state.scope,
     city: state.city,
     pincode: state.pincode || "(not given)",
-    size: state.size || "(not given)",
     timeline: state.timeline,
     budget: state.budget || "(not given)",
     name: state.name,
